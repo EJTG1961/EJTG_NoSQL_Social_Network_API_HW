@@ -1,43 +1,29 @@
 // Require what is needed from packages installed
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
 
 // create a new schema with table columns to export
-const UserSchema = new Schema(
+const userSchema = new Schema(
   {
     username: {
       type: String,
       unique: true,
+      required: true,
       trim: true,
-      required: "Username is Required",
     },
-
     email: {
       type: String,
       unique: true,
-      required: "Email is Required",
-      match: [/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/],
+      required: true,
+      match: [/.+@.+\..+/, "Enter a valid e-mail address"],
     },
-
-    thoughts: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Thought",
-      },
-    ],
-     
-    // Array of nested friends
-    friends: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    thoughts: [],
+    friends: [this],
   },
   {
     toJSON: {
+      getters: true,
       virtuals: true,
     },
-    id: false,
   }
 );
 // Keep virtual friends count

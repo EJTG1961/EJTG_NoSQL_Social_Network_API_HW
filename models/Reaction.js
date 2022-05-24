@@ -1,52 +1,30 @@
-// Require what's needed
-const { Schema, model } = require("mongoose");
-const thoughtSchema = require("./Thought");
+const { Schema, Types } = require("mongoose");
 const dateFormat = require("../utils/dateFormat");
 
-const reactionSchema = new Schema(
-  {
-    reactionId: {
-      // Mongoose's ObjectId data type
-      type: Schema.Types.ObjectId,
-      // Default value is set to a new ObjectId
-      default: () => new Types.ObjectId(),
-    },
-
-    reactionBody: {
-      type: String,
-      required: true,
-      maxlength: 280,
-    },
-
-    createdAt: {
-      type: Date,
-      // Set default value to current timestamp
-      default: Date.now,
-      // getter method to format timestamp when query
-      get: (timestamp) => dateFormat(timestamp),
-    },
-
-    username: {
-      type: String,
-      required: true,
-    },
-
-    // array created with the reactionSchema
-    reactions: [reactionSchema],
+// creaste reaction schema
+const reactionSchema = new Schema({
+  reactionId: {
+    type: Schema.Types.ObjectId,
+    default: () => new Types.ObjectId(),
   },
-  {
-    toJSON: {
-      getters: true,
-      virtuals: true,
-    },
-    id: false,
-  }
-);
-
-reactionSchema.virtual("reactionCount").get(function () {
-  return this.reactions.length;
+  reactionBody: {
+    type: String,
+    required: true,
+    validate: [
+      ({ length }) => length <= 280,
+      "Cannot be more than 280 characters long!",
+    ],
+  },
+  username: {
+    type: String,
+    required: true,
+  },
+  // date format
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    get: (createdAtVal) => dateFormat(createdAtVal),
+  },
 });
 
-const Reaction = model("Reaction", reactionSchema);
-
-module.exports = Reaction;
+module.exports = reactionSchema;
